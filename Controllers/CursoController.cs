@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using apiUniversidade.Model;
 using apiUniversidade.Context;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace apiUniversidade.Controllers
 {
@@ -31,6 +32,18 @@ namespace apiUniversidade.Controllers
             return cursos;
         }
 
+        
+        [HttpGet("{id:int}", Name="GetCurso")]
+        public ActionResult<Curso> Get(int id)
+        {
+           var cursos = _context.Cursos.FirstOrDefault(p => p.Id == id);
+           if(cursos is null)
+                return NotFound("Curso não encontrado.");
+
+            return cursos;
+        }
+
+
         [HttpPost]
         public ActionResult Post(Curso curso){
             _context.Cursos.Add(curso);
@@ -39,6 +52,17 @@ namespace apiUniversidade.Controllers
             return new CreatedAtRouteResult("GetCurso", 
                 new{ id = curso.Id},
                 curso);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult Put(int id, Curso curso){
+            if(id != curso.Id)
+                return BadRequest();
+
+            _context.Entry(curso).State = EntityState.Modified;
+            _context.SaveChanges();
+
+            return Ok(curso);
         }
     }
 }
