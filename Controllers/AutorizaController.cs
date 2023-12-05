@@ -63,6 +63,38 @@ namespace apiUniversidade.Controllers{
                     return BadRequest(ModelState);
                 }
             } 
+
+        private UsuarioToken GeraToken(UsuarioDTO userInfo){
+
+            var claims = new[]{
+                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.UniqueNmae,userInfo.Email),
+                new Claim("IFRN","TecInfo"),
+                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["Jwt:key"]));
+
+            var credentials = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
+
+            var expiracao =_configuration["TokenConfiguration:ExpireHours"];
+            var expiration = DateTime.UtcNow.AddHours(double.Parse(expiracao));
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                issuer: _configuration["TokenConfiguration:Issuer"],
+                audience: _configuration["TokenConfiguration:Audience"],
+                claims: claims,
+                expires: expiration,
+                signingCredentials: credentials
+            );
+
+            return new UsuarioToken(){
+                Authenticated = true,
+                Expiration = expiration,
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Messege = "JWT Ok."
+            };
+        }
             
     }
 }
