@@ -8,8 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
+using System.IdentityModel.Tokens.Jwt;
 using ApiUniversidade.DTO;
-
+using System.Security.Claims;
+using System.Text;
 
 namespace apiUniversidade.Controllers{
     [ApiController]
@@ -47,7 +51,7 @@ namespace apiUniversidade.Controllers{
                     return BadRequest(result.Errors);
                 
                 await _signInManager.SignInAsync(user, false);
-                return Ok();
+                return Ok(GeraToken(model));
             }
         
         [HttpPost("login")]
@@ -57,7 +61,7 @@ namespace apiUniversidade.Controllers{
                     isPersistent: false, lockoutOnFailure: false);
                 
                 if(result.Succeeded)
-                    return Ok();
+                    return Ok(GeraToken(userInfo));
                 else{
                     ModelState.AddModelError(string.Empty,"Login Inválido...");
                     return BadRequest(ModelState);
@@ -67,9 +71,9 @@ namespace apiUniversidade.Controllers{
         private UsuarioToken GeraToken(UsuarioDTO userInfo){
 
             var claims = new[]{
-                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.UniqueNmae,userInfo.Email),
+                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.UniqueName,userInfo.Email),
                 new Claim("IFRN","TecInfo"),
-                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 
             var key = new SymmetricSecurityKey(
@@ -80,7 +84,7 @@ namespace apiUniversidade.Controllers{
             var expiracao =_configuration["TokenConfiguration:ExpireHours"];
             var expiration = DateTime.UtcNow.AddHours(double.Parse(expiracao));
 
-            JwtSecurityToken token = new JwtSecurityToken(
+            System.IdentityModel.Tokens.Jwt.JwtSecurityToken token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
                 issuer: _configuration["TokenConfiguration:Issuer"],
                 audience: _configuration["TokenConfiguration:Audience"],
                 claims: claims,
