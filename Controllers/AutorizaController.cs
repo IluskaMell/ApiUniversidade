@@ -14,11 +14,9 @@ using System.IdentityModel.Tokens.Jwt;
 using ApiUniversidade.DTO;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
 
-    namespace apiUniversidade.Controllers;
-
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    namespace apiUniversidade.Controllers
+{
     [ApiController]
     [Route("[controller]")]
     public class AutorizaController : Controller
@@ -104,6 +102,6 @@ using Microsoft.AspNetCore.Authorization;
         }
             
     }
-
+}
 
     
