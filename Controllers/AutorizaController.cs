@@ -14,8 +14,11 @@ using System.IdentityModel.Tokens.Jwt;
 using ApiUniversidade.DTO;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
-namespace apiUniversidade.Controllers{
+    namespace apiUniversidade.Controllers;
+
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [ApiController]
     [Route("[controller]")]
     public class AutorizaController : Controller
@@ -101,6 +104,6 @@ namespace apiUniversidade.Controllers{
         }
             
     }
-}
+
 
     
