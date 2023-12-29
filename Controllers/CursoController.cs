@@ -26,7 +26,7 @@ namespace apiUniversidade.Controllers
         }
 
         [HttpGet(Name="GetExemplo")]
-        [Route("exemplo")]
+        [Route("exemplo")] 
         public String GetExemplo()
         {
             return "Api v1";
